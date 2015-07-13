@@ -1,0 +1,15 @@
+{
+  "name": "alexa_harmony_hub_app",
+  "version": "1.0.0",
+  "description": "A aplication to connect Amazon Echo(Alexa) directly to logitech harmony hub",
+  "main": "remote.js",
+  "author": "Sushil Singh <sushilks@gmail.com> http://sushilks.blogspot.com/",
+  "license": "MIT",
+  "dependencies": {
+    "alexa-app": "^2.1.0",
+    "harmony-hub-util": "^1.0.5",
+    "body-parser": "~1.0.1",
+    "ejs": "~0.7.1",
+    "express": "~4.0.0"
+  }
+}
