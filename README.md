@@ -1,15 +1,19 @@
 # alexaHarmonyApp
 An application allowing Amazon Echo (Alexa) to directly control Harmony Remote control
 
+
 ## What is it
 --------------
 A server that allows your Amazon Echo (Alexa) to communicate with your Harmony Remote control.
 It can be easily configure to carry out scripting of commands to send to your remote.
 
+Thanks to the work form https://github.com/matt-kruse/alexa-app-server
+this was fairly easy to put together.
 
 ## Pre-requiste
 ----------------
 Latest Node.js
+
 
 ## Installation
 ----------------
