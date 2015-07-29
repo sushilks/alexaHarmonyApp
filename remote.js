@@ -28,7 +28,7 @@ function execCmdDF(hutils, is_device, dev_or_act, cmd, cnt, fn, res) {
         if (res) {
             setTimeout(function () {
                 execCmdDF(hutils, is_device, dev_or_act, cmd, cnt - 1, fn, res);
-            }, 200);
+            }, 300);
         }
     });
 }
@@ -48,7 +48,7 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
 }
 
 function execActivity(act, fn) {
-    new HarmonyUtils(hub_ip).then(function (hutil) {
+    new HarmonyUtils(hub_ip).then(function (hutils) {
         hutils.executeActivity(act).then(function (res) {
             fn(res);
         });
@@ -108,6 +108,54 @@ app.intent('MuteVolume',
         });
     });
 
+
+app.intent('IncreaseTVVolume',
+    {
+        "slots" : {'AMOUNT' : 'NUMBER'},
+        "utterances" : ["{increase|} TV volume by {1-9|AMOUNT}"]
+    },
+    function (req, res) {
+        var amt = parseInt(req.slot('AMOUNT'), 10);
+        if (isNaN(amt)) {
+            amt = 1;
+        }
+        res.say('Increasing volume by ' + amt);
+        console.log('Increasing volume by ' + amt);
+        execCmd('TV', 'VolumeUp', amt, function (res) {
+            console.log("Command Volume UP was executed with result : " + res);
+        });
+    });
+app.intent('DecreaseTVVolume',
+    {
+        "slots" : {'AMOUNT' : 'NUMBER'},
+        "utterances" : ["{decrease TV volume|reduce TV volume} by {1-9|AMOUNT}"]
+    },
+    function (req, res) {
+        var amt = parseInt(req.slot('AMOUNT'), 10);
+        if (isNaN(amt)) {
+            amt = 1;
+        }
+        res.say('Decreasing volume by ' + amt);
+        console.log('Decreasing volume by ' + amt);
+        execCmd('TV', 'VolumeDown', amt, function (res) {
+            console.log("Command Volume Down was executed with result : " + res);
+        });
+    });
+
+app.intent('MuteTVVolume',
+    {
+        "slots" : {},
+        "utterances" : ["{mute|unmute} {TV|telivision}"]
+    },
+    function (req, res) {
+        res.say('Muting!');
+        console.log('Muting!');
+        execCmd('TV', 'Mute', 1, function (res) {
+            console.log("Command Mute executed with result : " + res);
+        });
+    });
+
+
 app.intent('TurnOffTV',
     {
         "slots" : {},
@@ -124,7 +172,7 @@ app.intent('TurnOffTV',
 app.intent('TurnOnTV',
     {
         "slots" : {},
-        "utterances" : ["{turn on the TV|turn the TV on}"]
+        "utterances" : ["{turn on the TV|turn the TV on|turn on TV}"]
     },
     function (req, res) {
         res.say('Turning TV on!');
@@ -216,7 +264,7 @@ app.intent('SelectPlaystation',
 app.intent('TurnOff',
     {
         "slots" : {},
-        "utterances" : ["{shutdown|good night|power everything off|shut down}"]
+        "utterances" : ["{shutdown|good night|power everything off|power off everything|turn everything off|turn off everything|shut down}"]
     },
     function (req, res) {
         res.say('Turning off everything!');
@@ -230,7 +278,7 @@ app.intent('TurnOff',
 app.intent('Movie',
     {
         "slots" : {},
-        "utterances" : ["{movie|start movie}"]
+        "utterances" : ["{movie|start movie|watch movie}"]
     },
     function (req, res) {
         res.say('Turning on Movie Mode!');
@@ -244,7 +292,7 @@ app.intent('Movie',
 app.intent('TIVO',
     {
         "slots" : {},
-        "utterances" : ["{tivo|start tivo}"]
+        "utterances" : ["{tivo|start tivo|watch tivo}"]
     },
     function (req, res) {
         res.say('Turning on Tivo Mode!');
