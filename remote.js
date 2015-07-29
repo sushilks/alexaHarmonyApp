@@ -20,16 +20,20 @@ function execCmdDF(hutils, is_device, dev_or_act, cmd, cnt, fn, res) {
                 " dev/act " + dev_or_act + " cmd = " + cmd);
     if (cnt === 0) {
         fn(res);
+        hutils.end();
         return;
     }
-    hutils.executeCommand(is_device, dev_or_act, cmd, function (res) {
+    hutils.executeCommand(is_device, dev_or_act, cmd).then(function (res) {
         console.log(cnt + ". Command " + cmd + " to device/activity " +
                     dev_or_act + " was executed with result : " + res);
         if (res) {
             setTimeout(function () {
                 execCmdDF(hutils, is_device, dev_or_act, cmd, cnt - 1, fn, res);
-            }, 300);
+            }, 100);
         }
+    }, function(err) {
+        console.log("ERROR Occured " + err);
+        console.log("      stack " + err.stack);
     });
 }
 
@@ -119,7 +123,7 @@ app.intent('IncreaseTVVolume',
         if (isNaN(amt)) {
             amt = 1;
         }
-        res.say('Increasing volume by ' + amt);
+        res.say('Increasing TV volume by ' + amt);
         console.log('Increasing volume by ' + amt);
         execCmd('TV', 'VolumeUp', amt, function (res) {
             console.log("Command Volume UP was executed with result : " + res);
@@ -135,7 +139,7 @@ app.intent('DecreaseTVVolume',
         if (isNaN(amt)) {
             amt = 1;
         }
-        res.say('Decreasing volume by ' + amt);
+        res.say('Decreasing TV volume by ' + amt);
         console.log('Decreasing volume by ' + amt);
         execCmd('TV', 'VolumeDown', amt, function (res) {
             console.log("Command Volume Down was executed with result : " + res);
@@ -148,7 +152,7 @@ app.intent('MuteTVVolume',
         "utterances" : ["{mute|unmute} {TV|telivision}"]
     },
     function (req, res) {
-        res.say('Muting!');
+        res.say('Muting TV!');
         console.log('Muting!');
         execCmd('TV', 'Mute', 1, function (res) {
             console.log("Command Mute executed with result : " + res);
@@ -172,7 +176,7 @@ app.intent('TurnOffTV',
 app.intent('TurnOnTV',
     {
         "slots" : {},
-        "utterances" : ["{turn on the TV|turn the TV on|turn on TV}"]
+        "utterances" : ["{turn on the TV|turn the TV on|turn on TV|turn TV on}"]
     },
     function (req, res) {
         res.say('Turning TV on!');
