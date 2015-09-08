@@ -12,8 +12,13 @@ this was fairly easy to put together.
 
 ## Pre-requiste
 ----------------
-Latest Node.js
+* A developer account with amazon. Access to Echo SDK.
+* Have already deployed SDK example apps and have good understanding of the workflow.
+* Have good understanding of how to deploy an application outside of lembda i.e. at your residence and have it connect to echo.
+* Latest Node.js
 
+I will try to help but best to get the amazon echo SDK related issues posted on amazon forum.
+This work is not usable off the self and requires some code manupulation befor it can be functional.
 
 ## Installation
 ----------------
