@@ -3,6 +3,7 @@ var alexa = require('alexa-app'),
     HarmonyUtils = require('harmony-hub-util'),
     harmony_clients = {},
     conf = require('./remote_conf.js'),
+    Q = require('q'),
     hub_ip = conf.hub_ip,
     app_id = conf.app_id;
 
@@ -51,20 +52,59 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
     });
 }
 
-function execActivityCmd(act, cmd, cnt, fn, res) {
+function waitForActivity(hutils, act, max_wait_timestamp) {
+   var deferred = Q.defer(),
+      wait_interval = 3000;
+   
+   hutils.readCurrentActivity().then(function (current_activity) {
+      if (current_activity != act) {
+         if (Date.now() > max_wait_timestamp) {
+            deferred.reject('Max wait time exceeded waiting for ' + act);
+            return;
+         }
+         console.log(act + ' is not the current activity yet, waiting another ' + wait_interval + 'ms ...');
+         setTimeout(function () {
+            waitForActivity(hutils, act, max_wait_timestamp).then(function (res) {
+               deferred.resolve(res);
+            }, function (err) {
+               deferred.reject(err);
+            });
+         }, wait_interval);
+      } else {
+         console.log(act + ' is now the current activity');
+         deferred.resolve(true);
+      }
+   }, function (err) {
+      deferred.reject(err);
+   });
+   
+   return deferred.promise;
+}
+
+function execActivityCmd(act, cmd, cnt) {
+   var max_wait_time = 15000;
+   
    new HarmonyUtils(hub_ip).then(function (hutils) {
-       var currentActivity = hutils.readCurrentActivity();
-       if (currentActivity != act) {
-          // Need to switch activities and wait
-          execActivity(act, function (res) {
-             setTimeout(function () {
-                execCmdCurrentActivity(cmd, 1);
-             }, 2000);
-          });
-       } else {
-          // Current activity matches requested, execute the command
-          execCmdCurrentActivity(cmd, 1);
-       }
+       hutils.readCurrentActivity().then(function (current_activity) {
+          if (current_activity != act) {
+             // Need to switch activities and wait
+             execActivity(act, function (res) {
+                waitForActivity(hutils, act, Date.now() + max_wait_time).then(function (res) {
+                   execCmdCurrentActivity(cmd, 1, function (res) {
+                      console.log('Command executed with result : ' + res);
+                   });
+                }, function (err) { 
+                   console.error(err);
+                });
+             });
+          } else {
+             console.log(act + ' is already the current activity, executing command');
+             // Current activity matches requested, execute the command
+             execCmdCurrentActivity(cmd, 1, function (res) {
+                console.log('Command executed with result : ' + res);
+             });
+          }
+       });
    });
 }
 
