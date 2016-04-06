@@ -5,7 +5,8 @@ var alexa = require('alexa-app'),
     conf = require('./remote_conf.js'),
     Q = require('q'),
     hub_ip = conf.hub_ip,
-    app_id = conf.app_id;
+    app_id = conf.app_id,
+    MAX_ACTIVITY_WAIT_TIME_MS = 15000;
 
 
 // Define an alexa-app
@@ -83,13 +84,12 @@ function waitForActivity(hutils, act, max_wait_timestamp) {
 
 function execActivityCmd(act, cmd, cnt) {
    var max_wait_time = 15000;
-   
    new HarmonyUtils(hub_ip).then(function (hutils) {
        hutils.readCurrentActivity().then(function (current_activity) {
           if (current_activity != act) {
              // Need to switch activities and wait
              execActivity(act, function (res) {
-                waitForActivity(hutils, act, Date.now() + max_wait_time).then(function (res) {
+                waitForActivity(hutils, act, Date.now() + MAX_ACTIVITY_WAIT_TIME_MS).then(function (res) {
                    execCmdCurrentActivity(cmd, 1, function (res) {
                       console.log('Command executed with result : ' + res);
                    });
@@ -99,7 +99,6 @@ function execActivityCmd(act, cmd, cnt) {
              });
           } else {
              console.log(act + ' is already the current activity, executing command');
-             // Current activity matches requested, execute the command
              execCmdCurrentActivity(cmd, 1, function (res) {
                 console.log('Command executed with result : ' + res);
              });
@@ -379,7 +378,7 @@ app.intent('Music',
 app.intent('WatchNBC',
       {
           "slots" : {},
-          "utterances" : ["{to|} watch nbc"]
+          "utterances" : ["{to|} watch NBC"]
       },
       function (req, res) {
           res.say('Turning on NBC!');
@@ -390,7 +389,7 @@ app.intent('WatchNBC',
 app.intent('WatchTBS',
       {
           "slots" : {},
-          "utterances" : ["{to|} watch tbs"]
+          "utterances" : ["{to|} watch TBS"]
       },
       function (req, res) {
           res.say('Turning on TBS!');
