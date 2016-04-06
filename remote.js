@@ -53,10 +53,6 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
 
 function execActivityCmd(act, cmd, cnt, fn, res) {
    new HarmonyUtils(hub_ip).then(function (hutils) {
-       hutils.readCurrentActivity().then(function (current_activity) {
-           execCmdDF(hutils, false, current_activity, cmd, cnt, fn, res);
-       });
-       
        var currentActivity = hutils.readCurrentActivity();
        if (currentActivity != act) {
           // Need to switch activities and wait
@@ -64,7 +60,7 @@ function execActivityCmd(act, cmd, cnt, fn, res) {
              setTimeout(function () {
                 execCmdCurrentActivity(cmd, 1);
              }, 2000);
-          }
+          });
        } else {
           // Current activity matches requested, execute the command
           execCmdCurrentActivity(cmd, 1);
