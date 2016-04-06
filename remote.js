@@ -265,49 +265,6 @@ app.intent('SelectPlaystation',
         });
     });
 
-app.intent('WatchNBC',
-      {
-          "slots" : {},
-          "utterances" : ["{to|} watch nbc"]
-      },
-      function (req, res) {
-          res.say('Turning on NBC!');
-          console.log('Turning on NBC!');
-          execActivity('Watch Tivo', function (res) {
-              console.log("Command to Watch Tivo executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 1, function (res) {
-              console.log("Command Tivo NumericBasic 1 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 6, function (res) {
-              console.log("Command Tivo NumericBasic 6 executed with result : " + res);
-          });
-      });
-app.intent('WatchTBS',
-      {
-          "slots" : {},
-          "utterances" : ["{to|} watch nbc"]
-      },
-      function (req, res) {
-          res.say('Turning on TBS!');
-          console.log('Turning on TBS!');
-          execActivity('Watch Tivo', function (res) {
-              console.log("Command to Watch Tivo executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 2, function (res) {
-              console.log("Command Tivo NumericBasic 2 executed with result : " + res);
-          });
-      });
-
 app.intent('TurnOff',
     {
         "slots" : {},
@@ -361,6 +318,50 @@ app.intent('Music',
             console.log("Command to Music executed with result : " + res);
         });
     });
+
+app.intent('WatchNBC',
+      {
+          "slots" : {},
+          "utterances" : ["{to|} watch nbc"]
+      },
+      function (req, res) {
+          res.say('Turning on NBC!');
+          console.log('Turning on NBC!');
+          execActivity('Watch Tivo', function (res) {
+              console.log("Command to Watch Tivo executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 5, function (res) {
+              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 1, function (res) {
+              console.log("Command Tivo NumericBasic 1 executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 6, function (res) {
+              console.log("Command Tivo NumericBasic 6 executed with result : " + res);
+          });
+      });
+
+app.intent('WatchTBS',
+      {
+          "slots" : {},
+          "utterances" : ["{to|} watch tbs"]
+      },
+      function (req, res) {
+          res.say('Turning on TBS!');
+          console.log('Turning on TBS!');
+          execActivity('Watch Tivo', function (res) {
+              console.log("Command to Watch Tivo executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 5, function (res) {
+              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 5, function (res) {
+              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+          });
+          execCmd('Tivo', 'NumericBasic', 2, function (res) {
+              console.log("Command Tivo NumericBasic 2 executed with result : " + res);
+          });
+      });
 
 
 module.exports = app;
