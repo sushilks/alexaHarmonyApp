@@ -51,6 +51,27 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
     });
 }
 
+function execActivityCmd(act, cmd, cnt, fn, res) {
+   new HarmonyUtils(hub_ip).then(function (hutils) {
+       hutils.readCurrentActivity().then(function (current_activity) {
+           execCmdDF(hutils, false, current_activity, cmd, cnt, fn, res);
+       });
+       
+       var currentActivity = hutils.readCurrentActivity();
+       if (currentActivity != act) {
+          // Need to switch activities and wait
+          execActivity(act, function (res) {
+             setTimeout(function () {
+                execCmdCurrentActivity(cmd, 1);
+             }, 2000);
+          }
+       } else {
+          // Current activity matches requested, execute the command
+          execCmdCurrentActivity(cmd, 1);
+       }
+   });
+}
+
 function execActivity(act, fn) {
     new HarmonyUtils(hub_ip).then(function (hutils) {
         hutils.executeActivity(act).then(function (res) {
@@ -327,12 +348,7 @@ app.intent('WatchNBC',
       function (req, res) {
           res.say('Turning on NBC!');
           console.log('Turning on NBC!');
-          execActivity('Watch Tivo', function (res) {
-              console.log("Command to Watch Tivo executed with result : " + res);
-              execCmdCurrentActivity(["NumericBasic,5", "NumericBasic,1", "NumericBasic,6"], 1, function (res) {
-                 console.log("Command NumericBasic was executed with result : " + res);
-              });
-          });
+          execActivityCmd('Watch Tivo', ["NumericBasic,5", "NumericBasic,1", "NumericBasic,6"], 1);
       });
 
 app.intent('WatchTBS',
@@ -343,12 +359,7 @@ app.intent('WatchTBS',
       function (req, res) {
           res.say('Turning on TBS!');
           console.log('Turning on TBS!');
-          execActivity('Watch Tivo', function (res) {
-              console.log("Command to Watch Tivo executed with result : " + res);
-              execCmdCurrentActivity(["NumericBasic,5", "NumericBasic,5", "NumericBasic,2"], 1, function (res) {
-                 console.log("Command NumericBasic was executed with result : " + res);
-              });
-          });
+          execActivityCmd('Watch Tivo', ["NumericBasic,5", "NumericBasic,5", "NumericBasic,2"], 1);
       });
 
 
