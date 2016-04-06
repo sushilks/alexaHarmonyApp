@@ -329,15 +329,15 @@ app.intent('WatchNBC',
           console.log('Turning on NBC!');
           execActivity('Watch Tivo', function (res) {
               console.log("Command to Watch Tivo executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 1, function (res) {
-              console.log("Command Tivo NumericBasic 1 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 6, function (res) {
-              console.log("Command Tivo NumericBasic 6 executed with result : " + res);
+              execCmd('Tivo', 'NumericBasic', 5, function (res) {
+                 console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+                 execCmd('Tivo', 'NumericBasic', 1, function (res) {
+                    console.log("Command Tivo NumericBasic 1 executed with result : " + res);
+                    execCmd('Tivo', 'NumericBasic', 6, function (res) {
+                       console.log("Command Tivo NumericBasic 6 executed with result : " + res);
+                   });
+                });
+             });
           });
       });
 
@@ -351,15 +351,15 @@ app.intent('WatchTBS',
           console.log('Turning on TBS!');
           execActivity('Watch Tivo', function (res) {
               console.log("Command to Watch Tivo executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 5, function (res) {
-              console.log("Command Tivo NumericBasic 5 executed with result : " + res);
-          });
-          execCmd('Tivo', 'NumericBasic', 2, function (res) {
-              console.log("Command Tivo NumericBasic 2 executed with result : " + res);
+              execCmd('Tivo', 'NumericBasic', 5, function (res) {
+                 console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+                 execCmd('Tivo', 'NumericBasic', 5, function (res) {
+                    console.log("Command Tivo NumericBasic 5 executed with result : " + res);
+                    execCmd('Tivo', 'NumericBasic', 2, function (res) {
+                       console.log("Command Tivo NumericBasic 2 executed with result : " + res);
+                   });
+                });
+             });
           });
       });
 
