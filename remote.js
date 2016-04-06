@@ -329,7 +329,7 @@ app.intent('WatchNBC',
           console.log('Turning on NBC!');
           execActivity('Watch Tivo', function (res) {
               console.log("Command to Watch Tivo executed with result : " + res);
-              execCmdCurrentActivity('NumericBasic', [ "5", "1", "6" ], function (res) {
+              execCmdCurrentActivity(["NumericBasic,5", "NumericBasic,1", "NumericBasic,6"], 1, function (res) {
                  console.log("Command NumericBasic was executed with result : " + res);
               });
           });
@@ -345,7 +345,7 @@ app.intent('WatchTBS',
           console.log('Turning on TBS!');
           execActivity('Watch Tivo', function (res) {
               console.log("Command to Watch Tivo executed with result : " + res);
-              execCmdCurrentActivity('NumericBasic', [ "5", "5", "2" ], function (res) {
+              execCmdCurrentActivity(["NumericBasic,5", "NumericBasic,5", "NumericBasic,2"], 1, function (res) {
                  console.log("Command NumericBasic was executed with result : " + res);
               });
           });
