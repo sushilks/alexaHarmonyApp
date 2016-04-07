@@ -53,6 +53,15 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
     });
 }
 
+/**
+ * Waits for a specific activity to be the current activity
+ * (assumes the activity has already been executed).
+ * 
+ * @param {string} hutils - The hutils to use
+ * @param {string} act - The activity to wait for
+ * @param {number} max_wait_timestamp - The timestamp to give up on waiting
+ * @returns deferred promise
+ */
 function waitForActivity(hutils, act, max_wait_timestamp) {
    var deferred = Q.defer(),
       wait_interval = 3000;
@@ -82,6 +91,14 @@ function waitForActivity(hutils, act, max_wait_timestamp) {
    return deferred.promise;
 }
 
+/**
+ * Executes a command for a specific activity, executing and waiting
+ * for that activity if needed.
+ * 
+ * @param {string} act - The activity the command should be executed under
+ * @param {string} cmd - The command to execute
+ * @param {string} cnt - The count
+ */
 function execActivityCmd(act, cmd, cnt) {
    var max_wait_time = 15000;
    new HarmonyUtils(hub_ip).then(function (hutils) {
@@ -91,16 +108,19 @@ function execActivityCmd(act, cmd, cnt) {
              execActivity(act, function (res) {
                 waitForActivity(hutils, act, Date.now() + MAX_ACTIVITY_WAIT_TIME_MS).then(function (res) {
                    execCmdCurrentActivity(cmd, 1, function (res) {
+                      hutils.end();
                       console.log('Command executed with result : ' + res);
                    });
                 }, function (err) { 
                    console.error(err);
+                   hutils.end();
                 });
              });
           } else {
              console.log(act + ' is already the current activity, executing command');
              execCmdCurrentActivity(cmd, 1, function (res) {
                 console.log('Command executed with result : ' + res);
+                hutils.end();
              });
           }
        });
@@ -375,27 +395,32 @@ app.intent('Music',
         });
     });
 
-app.intent('WatchNBC',
-      {
-          "slots" : {},
-          "utterances" : ["{to|} watch NBC"]
-      },
-      function (req, res) {
-          res.say('Turning on NBC!');
-          console.log('Turning on NBC!');
-          execActivityCmd('Watch Tivo', ["NumericBasic,5", "NumericBasic,1", "NumericBasic,6"], 1);
-      });
+function getChannelFunction(channel) {
+   return function (req, res) {
+      res.say('Turning on ' + channel.utterance_name + '!');
+      console.log('Turning on ' + channel.utterance_name + '!');
+      var cmd = [], channel_chars = channel.channel.split(""), j;
+      for (j = 0; j < channel_chars.length; j++) { 
+         cmd[j] = 'NumericBasic,' + channel_chars[j];
+      }
+      execActivityCmd(channel.activity, cmd, 1);
+   }
+}
 
-app.intent('WatchTBS',
-      {
-          "slots" : {},
-          "utterances" : ["{to|} watch TBS"]
-      },
-      function (req, res) {
-          res.say('Turning on TBS!');
-          console.log('Turning on TBS!');
-          execActivityCmd('Watch Tivo', ["NumericBasic,5", "NumericBasic,5", "NumericBasic,2"], 1);
-      });
-
+if (conf.channels) {
+   var channel_index;
+   for (channel_index = 0; channel_index < conf.channels.length; channel_index++) {
+      var channel = conf.channels[channel_index];
+      app.intent(channel.intent,
+            {
+                "slots" : {},
+                "utterances" : ["{to|} watch " + channel.utterance_name]
+            },
+            getChannelFunction(channel));
+      console.log('Added intent ' + channel.intent + 
+            ' with utterance ' + channel.utterance_name + 
+            ' which triggers channel ' + channel.channel );
+   }
+}
 
 module.exports = app;
