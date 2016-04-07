@@ -38,12 +38,28 @@ Put the created certificate in ./cert directory
 ### Configure the Application
 Create the application on amazon and copy the application id for it.
 Modify the variables at the top of the file "remote_conf.js"
-   hub_ip : IP address of the harmony hub.
-   app_id : Application ID as registered on amazon.
+```
+hub_ip : IP address of the harmony hub.
+app_id : Application ID as registered on amazon.
+```
+
+You can optionally add an array of channels under specific activities
+```
+channels : [
+     {
+       intent : 'WatchNBC',
+       utterance_name : 'NBC',
+       activity: 'Watch Tivo',
+       channel: "516"
+    }
+]
+```
 
 ### Run the server
->node server.js
+```
+node server.js
 Listening on port 443
+```
 
 ### Point your browser to the server
 https://xx.yy.xx.yy/remote
@@ -55,7 +71,7 @@ You will need to use this to configure the application on amazon.
 
 ## Example Usages
 ----------------
-This was how I programed the remote for my use case, it's fairly easy to customize it.
+This was how I programmed the remote for my use case, it's fairly easy to customize it.
 
 ### Direct commands to devices
 
@@ -74,3 +90,8 @@ Alexa tell remote to start Movie
 Alexa tell remote to start Music
 
 Alexa tell remote to power everything off
+
+### Channel commands
+
+Alexa tell remote to watch TBS
+(note this will also turn on the required activity)

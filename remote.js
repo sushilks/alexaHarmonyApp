@@ -100,7 +100,6 @@ function waitForActivity(hutils, act, max_wait_timestamp) {
  * @param {string} cnt - The count
  */
 function execActivityCmd(act, cmd, cnt) {
-   var max_wait_time = 15000;
    new HarmonyUtils(hub_ip).then(function (hutils) {
        hutils.readCurrentActivity().then(function (current_activity) {
           if (current_activity != act) {
@@ -395,6 +394,12 @@ app.intent('Music',
         });
     });
 
+/**
+ * Creates an intent function for a specific channel configuration
+ * 
+ * @param {object} channel - The channel configuration to create the function for
+ * @returns {function} The channel intent function
+ */
 function getChannelFunction(channel) {
    return function (req, res) {
       res.say('Turning on ' + channel.utterance_name + '!');
@@ -408,6 +413,7 @@ function getChannelFunction(channel) {
 }
 
 if (conf.channels) {
+   // Iterate through the configured channels and create intents for them
    var channel_index;
    for (channel_index = 0; channel_index < conf.channels.length; channel_index++) {
       var channel = conf.channels[channel_index];
