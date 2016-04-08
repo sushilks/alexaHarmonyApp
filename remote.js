@@ -3,8 +3,10 @@ var alexa = require('alexa-app'),
     HarmonyUtils = require('harmony-hub-util'),
     harmony_clients = {},
     conf = require('./remote_conf.js'),
+    Q = require('q'),
     hub_ip = conf.hub_ip,
-    app_id = conf.app_id;
+    app_id = conf.app_id,
+    MAX_ACTIVITY_WAIT_TIME_MS = 15000;
 
 
 // Define an alexa-app
@@ -49,6 +51,79 @@ function execCmdCurrentActivity(cmd, cnt, fn, res) {
             execCmdDF(hutils, false, current_activity, cmd, cnt, fn, res);
         });
     });
+}
+
+/**
+ * Waits for a specific activity to be the current activity
+ * (assumes the activity has already been executed).
+ * 
+ * @param {string} hutils - The hutils to use
+ * @param {string} act - The activity to wait for
+ * @param {number} max_wait_timestamp - The timestamp to give up on waiting
+ * @returns deferred promise
+ */
+function waitForActivity(hutils, act, max_wait_timestamp) {
+   var deferred = Q.defer(),
+      wait_interval = 3000;
+   
+   hutils.readCurrentActivity().then(function (current_activity) {
+      if (current_activity != act) {
+         if (Date.now() > max_wait_timestamp) {
+            deferred.reject('Max wait time exceeded waiting for ' + act);
+            return;
+         }
+         console.log(act + ' is not the current activity yet, waiting another ' + wait_interval + 'ms ...');
+         setTimeout(function () {
+            waitForActivity(hutils, act, max_wait_timestamp).then(function (res) {
+               deferred.resolve(res);
+            }, function (err) {
+               deferred.reject(err);
+            });
+         }, wait_interval);
+      } else {
+         console.log(act + ' is now the current activity');
+         deferred.resolve(true);
+      }
+   }, function (err) {
+      deferred.reject(err);
+   });
+   
+   return deferred.promise;
+}
+
+/**
+ * Executes a command for a specific activity, executing and waiting
+ * for that activity if needed.
+ * 
+ * @param {string} act - The activity the command should be executed under
+ * @param {string} cmd - The command to execute
+ * @param {string} cnt - The count
+ */
+function execActivityCmd(act, cmd, cnt) {
+   new HarmonyUtils(hub_ip).then(function (hutils) {
+       hutils.readCurrentActivity().then(function (current_activity) {
+          if (current_activity != act) {
+             // Need to switch activities and wait
+             execActivity(act, function (res) {
+                waitForActivity(hutils, act, Date.now() + MAX_ACTIVITY_WAIT_TIME_MS).then(function (res) {
+                   execCmdCurrentActivity(cmd, 1, function (res) {
+                      hutils.end();
+                      console.log('Command executed with result : ' + res);
+                   });
+                }, function (err) { 
+                   console.error(err);
+                   hutils.end();
+                });
+             });
+          } else {
+             console.log(act + ' is already the current activity, executing command');
+             execCmdCurrentActivity(cmd, 1, function (res) {
+                console.log('Command executed with result : ' + res);
+                hutils.end();
+             });
+          }
+       });
+   });
 }
 
 function execActivity(act, fn) {
@@ -319,5 +394,45 @@ app.intent('Music',
         });
     });
 
+/**
+ * Creates an intent function for a specific channel configuration
+ * 
+ * @param {object} channel - The channel configuration to create the function for
+ * @returns {function} The channel intent function
+ */
+function getChannelFunction(channel) {
+   return function (req, res) {
+      res.say('Starting to ' + channel.utterance_name + '!');
+      console.log('Starting to ' + channel.utterance_name + '!');
+      var cmd = [], channel_chars = channel.channel.split(""), j;
+      for (j = 0; j < channel_chars.length; j++) { 
+         cmd[j] = 'NumericBasic,' + channel_chars[j];
+      }
+      execActivityCmd(channel.activity, cmd, 1);
+   }
+}
+
+if (conf.channels) {
+   // Iterate through the configured channels and create intents for them
+   var channel_index;
+   for (channel_index = 0; channel_index < conf.channels.length; channel_index++) {
+      var channel = conf.channels[channel_index];
+      // Build an intent name
+      var intent = channel.activity.replace(" ", "");
+      intent = intent.charAt(0).toUpperCase() + intent.slice(1);
+      var utterance = channel.utterance_name.replace(" ", "");
+      utterance = utterance.charAt(0).toUpperCase() + utterance.slice(1);
+      intent = intent + utterance;
+      app.intent(intent,
+            {
+                "slots" : {},
+                "utterances" : ["{to|} " + channel.utterance_name]
+            },
+            getChannelFunction(channel));
+      console.log('Added intent ' + intent + 
+            ' with utterance ' + channel.utterance_name + 
+            ' which triggers channel ' + channel.channel );
+   }
+}
 
 module.exports = app;
