@@ -47,8 +47,7 @@ You can optionally add an array of channels under specific activities
 ```
 channels : [
      {
-       intent : 'WatchNBC',
-       utterance_name : 'NBC',
+       utterance_name : 'watch NBC',
        activity: 'Watch Tivo',
        channel: "516"
     }
