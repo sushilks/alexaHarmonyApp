@@ -412,10 +412,6 @@ function getChannelFunction(channel) {
    }
 }
 
-function capitalizeFirstLetter(string) {
-   return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 if (conf.channels) {
    // Iterate through the configured channels and create intents for them
    var channel_index;
