@@ -4,14 +4,12 @@ module.exports = {
 //    Optional channel configuration
 //    channels : [
 //         {
-//           intent : 'WatchNBC',
-//           utterance_name : 'NBC',
+//           utterance_name : 'watch NBC',
 //           activity: 'Watch Tivo',
 //           channel: "516"
 //        },
 //        {
-//           intent : 'WatchTBS',
-//           utterance_name : 'TBS',
+//           utterance_name : 'watch TBS',
 //           activity: 'Watch Tivo',
 //           channel: "552"
 //        }

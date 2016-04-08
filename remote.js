@@ -402,8 +402,8 @@ app.intent('Music',
  */
 function getChannelFunction(channel) {
    return function (req, res) {
-      res.say('Turning on ' + channel.utterance_name + '!');
-      console.log('Turning on ' + channel.utterance_name + '!');
+      res.say('Starting to ' + channel.utterance_name + '!');
+      console.log('Starting to ' + channel.utterance_name + '!');
       var cmd = [], channel_chars = channel.channel.split(""), j;
       for (j = 0; j < channel_chars.length; j++) { 
          cmd[j] = 'NumericBasic,' + channel_chars[j];
@@ -412,18 +412,28 @@ function getChannelFunction(channel) {
    }
 }
 
+function capitalizeFirstLetter(string) {
+   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 if (conf.channels) {
    // Iterate through the configured channels and create intents for them
    var channel_index;
    for (channel_index = 0; channel_index < conf.channels.length; channel_index++) {
       var channel = conf.channels[channel_index];
-      app.intent(channel.intent,
+      // Build an intent name
+      var intent = channel.activity.replace(" ", "");
+      intent = intent.charAt(0).toUpperCase() + intent.slice(1);
+      var utterance = channel.utterance_name.replace(" ", "");
+      utterance = utterance.charAt(0).toUpperCase() + utterance.slice(1);
+      intent = intent + utterance;
+      app.intent(intent,
             {
                 "slots" : {},
-                "utterances" : ["{to|} watch " + channel.utterance_name]
+                "utterances" : ["{to|} " + channel.utterance_name]
             },
             getChannelFunction(channel));
-      console.log('Added intent ' + channel.intent + 
+      console.log('Added intent ' + intent + 
             ' with utterance ' + channel.utterance_name + 
             ' which triggers channel ' + channel.channel );
    }
