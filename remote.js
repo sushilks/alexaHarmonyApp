@@ -11,6 +11,7 @@ var alexa = require('alexa-app'),
 
 // Define an alexa-app
 var app = new alexa.app('remote');
+app.id = conf.app_id
 
 app.launch(function(req, res) {
     console.log("Launching the application");
